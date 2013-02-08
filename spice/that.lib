@@ -1,0 +1,1314 @@
+*	THAT CORPORATION SPICE models 
+*	Document #660852
+*
+*	REV.	00 1/24/96
+*        	01 1/9/98
+*      	02 11/9/98	
+*		03 8/16/99	- Added NPN and PNP Transistors from 100-series arrays
+*	  	04 9/28/04	- Added THAT124x and THAT120x series spice models
+*			- Deleted NPN and PNP Transistors from 100-series arrays
+*			- Added NPN and PNP Transistors from 300-series arrays
+*	  	        - Models names were changed for more consistency as follows:
+*				4301VCA to 4301VCA_THAT
+*			        4301OA1 to 4301OA1_THAT
+*				4301OA2 to 4301OA2_THAT
+*				4301OA3 to 4301OA3_THAT
+*				4301RMS to 4301RMS_THAT
+*				T2180A to 2180A_THAT
+*				T2180B to 2180B_THAT
+*				T2180C to 2180C_THAT
+*				T2181A to 2181A_THAT
+*				T2181B to 2181B_THAT
+*				T2181C to 2181C_THAT
+*		05  3/6/09	- Added * before "THAT 300-Series Noise Performance Optimized Models"
+*
+* This information is protected under the United States copyright 
+* laws. THAT Corporation ("THAT") hereby grants users of this 
+* macromodel (the "User"), a nonexclusive, nontransferable 
+* license to use this macromodel as long as the licensee abides
+* by the terms of this agreement.  Before using the macromodel,
+* the User should read this license.  If the User does not accept
+* these terms, the macromodel contained herein should be erased, 
+* destroyed or returned to THAT within 30 days.
+*
+* The User may copy and distribute, at no charge, verbatim copies
+* of the Macromodel as contained herein, in any medium, provided 
+* that the User conspicuously publishes on each copy this copyright 
+* notice and disclaimer of warranty.  The User may modify this
+* macromodel to suit his or her specific applications, and the User
+* may make copies of the modified macromodel for use within his or  
+* her company only, and provided the modified files carry prominent 
+* notices stating that the files have been changed, and the date of 
+* any changes.
+* 
+* This macromodel is provided "AS IS, WHERE IS, AND WITH NO WARRANTY
+* OF ANY KIND EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED
+* TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+* PARTICULAR PURPOSE."  In no event will THAT be liable for special,
+* collateral, incidental, or consequential damages in connection
+* with or arising out of the use of this macromodel.  THAT reserves
+* the right to make changes to the products and macromodel without
+* prior notice.
+*
+*$
+* ======================================================================== 
+*THAT4301 VCA MACROMODEL
+*CONNECTIONS:
+*	            Iin - Current Input
+*	             |     Ec+ - Positive Control Port
+*	             |      |    Ec- - Negative Control Port
+*	             |      |      |     Sym - Symmetry Adjust Terminal
+* 	             |      |      |      |    Vcc - Positive Supply Voltage
+* 	             |      |      |      |      |    Vee - Negative Supply Voltage
+*	             |      |      |      |      |      |    Iout - Current Output
+*	             |      |      |      |      |      |      |  GND
+*  	             |      |      |      |      |      |      |   |
+.SUBCKT 4301VCA_THAT P17    P15    P16    P14    P11    P10    P13   P9
+*
+J1 3 P17 1 FET 4
+J2 4 P9 2 FET 4
+CIN P17 P10 50pF
+RS1 1 7 2.4K
+RS2 2 7 2.4K
+I1 P11 7 120uA
+C2 3 4 20pF
+RD1 3 P10 1K
+RD2 4 P10 1K
+GA P11 8 4 3 .001
+RC1 8 0 12.6MEG
+CC 8 5 55pF
+RC2 5 P10 3K
+EA P11 9 8 0 1
+RA 9 10 820
+CZ 9 10 300pF
+Q1 10 10 11 QNPN
+Q2 10 10 12 QNPN
+RE1 11 13 1
+RE2 12 14 0.9
+Q3 P17 P15 13 QPNP
+Q4 P13 P16 14 QPNP
+Q5 P17 P16 15 QNPN
+Q6 P13 P14 16 QNPN
+RE3 15 17 1
+RE4 16 18 0.9
+Q7 19 19 17 QPNP
+Q8 19 19 18 QPNP
+COUT P13 0 35pF
+I2 19 P10 6mA
+IBIAS 0 6 30uA
+Q9 6 6 20 QNPN
+Q10 0 0 20 QPNP
+EBIAS 10 19 6 0 2
+.MODEL FET PJF(VTO=-1.46 BETA=1.67E-4 IS=10E-14)
+.MODEL QNPN NPN(IS=6E-15 BF=250 VAF=95 CJE=7.5pF CJC=2.7pF)
+.MODEL QPNP PNP(IS=4.7E-14 BF=125 VAF=50 CJE=20pF CJC=33pF)
+.ENDS
+*
+* ======================================================================== 
+* THAT4301 OA1 Macromodel
+* REV 01 1/9/98
+* Note that this model corresponds to the opamp accessed through pins
+* 18, 19, and 20 of the 4301P (DIP package).  Power supply connections
+* must be added as indicated below.
+*
+* connections:       non-inverting input
+*                     | inverting input
+*                     | | positive power supply
+*                     | | | negative power supply
+*                     | | | | output
+*                     | | | | |
+.subckt 4301OA1_THAT  1 2 3 4 5
+*
+  c1   11 12 14.5E-12
+  c2    6  7 25.00E-12
+  dc    5 53 dx
+  de   54  5 dx
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 3.255E6 -3E6 3E6 3E6 -3E6
+  ga    6  0 11 12 785.4E-6
+  gcm   0  6 10 99 7.854E-9
+  iee   3 10 dc 50.30E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx
+  q2   12  1 14 qx
+  r2    6  9 100.0E3
+  rc1   4 11 1.273E3
+  rc2   4 12 1.273E3
+  re1  13 10 237.2
+  re2  14 10 237.2
+  ree  10 99 3.976E6
+  ro1   8  5 220
+  ro2   7 99 220
+  rp    3  4 48.66E3
+  vb    9  0 dc 0
+  vc    3 53 dc 1.600
+  ve   54  4 dc 1.200
+  vlim  7  8 dc 0
+  vlp  91  0 dc 3.40
+  vln   0 92 dc 5.90
+.model dx D(Is=800.0E-18)
+.model qx PNP(Is=800.0E-18 Bf=166.7)
+.ends
+*
+* ======================================================================== 
+* THAT4301 OA2 Macromodel
+* REV 01 1/9/98
+* Note that this model corresponds to the opamp accessed through pins
+* 6, 7, and 8 of the 4301P (DIP package).  Power supply connections
+* must be added as indicated below.
+*
+* connections:       non-inverting input
+*                    | inverting input
+*                    | | positive power supply
+*                    | | | negative power supply
+*                    | | | | output
+*                    | | | | |
+.subckt 4301OA2_THAT 1 2 3 4 5
+*
+  c1   11 12 13.5E-12
+  c2    6  7 25.00E-12
+  dc    5 53 dx
+  de   54  5 dx
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 1.830E6 -2E6 2E6 2E6 -2E6
+  ga    6  0 11 12 785.4E-6
+  gcm   0  6 10 99 7.854E-9
+  iee   3 10 dc 50.30E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx
+  q2   12  1 14 qx
+  r2    6  9 100.0E3
+  rc1   4 11 1.273E3
+  rc2   4 12 1.273E3
+  re1  13 10 237.2
+  re2  14 10 237.2
+  ree  10 99 3.976E6
+  ro1   8  5 220
+  ro2   7 99 220
+  rp    3  4 66.69E3
+  vb    9  0 dc 0
+  vc    3 53 dc 1.600
+  ve   54  4 dc 1.200
+  vlim  7  8 dc 0
+  vlp  91  0 dc 3.40
+  vln   0 92 dc 5.90
+.model dx D(Is=800.0E-18)
+.model qx PNP(Is=800.0E-18 Bf=166.7)
+.ends
+*
+* ======================================================================== 
+* THAT4301 OA3 Macromodel
+* REV 01 1/9/98
+* Note that this model corresponds to the opamp accessed through pins
+* 12 and 13 of the 4301P (DIP package).  The non-inverting input is
+* internally connected to ground in the 4301.  Power supply connections
+* must be added as indicated below.
+*
+* connections:       non-inverting input
+*                     | inverting input
+*                     | | positive power supply
+*                     | | | negative power supply
+*                     | | | | output
+*                     | | | | |
+.subckt 4301OA3_THAT  1 2 3 4 5
+*
+  c1   11 12 14.0E-12
+  c2    6  7 25.00E-12
+  dc    5 53 dx
+  de   54  5 dx
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 50.32E6 -50E6 50E6 50E6 -50E6
+  ga    6  0 11 12 785.4E-6
+  gcm   0  6 10 99 7.854E-9
+  iee   3 10 dc 50.30E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx
+  q2   12  1 14 qx
+  r2    6  9 100.0E3
+  rc1   4 11 1.273E3
+  rc2   4 12 1.273E3
+  re1  13 10 237.2
+  re2  14 10 237.2
+  ree  10 99 3.976E6
+  ro1   8  5 45
+  ro2   7 99 45
+  rp    3  4 31.58E3
+  vb    9  0 dc 0
+  vc    3 53 dc 1.500
+  ve   54  4 dc 1.400
+  vlim  7  8 dc 0
+  vlp  91  0 dc 11.40
+  vln   0 92 dc 18
+.model dx D(Is=800.0E-18)
+.model qx PNP(Is=800.0E-18 Bf=166.7)
+.ends
+*
+* ======================================================================== 
+* THAT4301 RMS Macromodel
+* REV 01 1/9/98
+* REV 02 6/9/98
+* REV 03 11/9/98
+* connections:       input current
+*                    |  timing current
+*                    |  |  timing capacitor
+*                    |  |  |  output current
+*                    |  |  |  |   negative power supply
+*                    |  |  |  |   |	 positive power supply
+*		     |  |  |  |   |  | ground
+*                    |  |  |  |   |  |  |
+.SUBCKT 4301RMS_THAT IN IT CT OUT V- V+ GND
+*
+I_bias       V+ IN 100p
+I_I1         V+ 1 DC .000120 AC 0 
+V_V2         2 3 DC .61 AC 0 
+V_V3         4 GND DC .65 AC 0 
+E_E1         5 GND GND gmout 1
+G_G1         GND gmout 6 7 .001
+R_R1         5 2  100  
+R_R2         In 8  500  
+R_R3         In 9  500  
+J_J1         7 In 10 jp4301rm 
+J_J2         6 GND 11 jp4301rm
+R_R4         V- 7  1k  
+R_R5         V- 6  1k  
+R_R6         10 1  400  
+R_R7         11 1  400  
+C_C1         7 6  10p  
+R_R8         GND gmout  100000k  
+C_C2         V- gmout  11p  
+F_F1         Ct V- VF_F1 1.1
+VF_F1        GND It 0V
+F_F2         GND 13 VF_F2 1
+VF_F2        4 12 0V
+Q_Q11        14 14 Ct qn4301rm
+E_E2         14 GND 13 GND 1
+E_E3         out GND Ct 15 1
+Q_Q19        12 12 16 qn4301rm
+Q_Q20        16 9 3 qn4301rm
+Q_Q21        In 8 3 qn4301rm
+Q_Q22        12 2 In qn4301rm
+Q_Q26        gmout gmout V+ qn4301rm 
+Q_Q27         V- V- gmout qn4301rm
+Q_Q23        13 13 17 qn4301rm
+Q_Q24        17 17 GND qn4301rm
+Q_Q25        15 15 GND qn4301rm
+I_I2         V+ 15 DC 8.2u AC 0 
+.model qn4301rm npn(bf=250 vaf=95 re=4)
+.MODEL jp4301rm PJF(VTO=-1.46 BETA=1.67E-4 IS=10E-14)
+.ENDS
+*
+* ======================================================================== 
+* THAT 2180A VCA SPICE Macromodel, Beta Version 1.B4 12/30/97*
+* Copyright 1997 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* Pin 4 is not used on the 2180-series VCAs.
+*
+*                 Iin          
+*                  |  Ec+ 
+*                  |   |   Ec-
+*                  |   |   |  Vee 
+*                  |   |   |   |  GND
+*                  |   |   |   |   |  Vcc 
+*                  |   |   |   |   |   |  Iout
+*                  |   |   |   |   |   |   |
+.SUBCKT 2180A_THAT 1   2   3   5   6   7   8 
+*
+*
+*
+R1         10 13  2.5k  
+R2         10 14  2.5k  
+I1         10 29 DC 50uA  
+R3         11 7  8k  
+R4         12 7  8k  
+G1         7 15 11 12 1.25e-4
+R5         0 15  10MEG  
+R6         0 16  10k  
+C1         16 15  10p  
+R7         19 7  2k  
+G2         19 20 15 0 5e-4
+C2         19 7  8p  
+E1         20 28 30 6 2
+R8         5 29  1.7k  
+V1         0 29 DC 2.1V  
+I2         0 30 DC 20uA  
+R9         4 2  27  
+C3         20 0  12p  
+I3         20 28 DC 220uA  
+V2         18 0 DC .7V  
+V3         17 15 DC 1.4V  
+Q1         11 1 13 QNHIB 
+Q2         12 9 14 QNHIB 
+Q3         20 21 23 QNPNNOM 
+Q4         20 22 24 QNPNNOM 
+Q5         8 4 27 QNPNNOM 
+Q6         1 25 26 QNPNNOM 
+Q7         1 2 23 QPNPNOM 
+Q8         8 3 24 QPNPNOM 
+Q9         28 28 27 QPNPNOM 
+Q10        28 28 26 QPNPNOM 
+Q11        28 29 5 QNPNNOM 
+Q12        30 30 31 QNPNNOM 
+Q13        0 0 31 QPNPNOM 
+D1         18 15 DNOM 
+D2         17 7 DNOM 
+R10        3 25  20  
+R11        22 20 20 
+R12        21 20 27  
+Vos        9 6 DC 3mV  
+Isym       0 4 DC -420nA  
+*    Isym = -420nA for typical THD.  Set to -1uA for worst case THD.
+.model qnpnnom npn (is=1e-15 bf=200, vaf=110, cjc=3pF)
+.model qpnpnom pnp (is=1e-15 bf=100, vaf=85, cjc=5pf)
+.model qnhib npn (bf=16000)
+.model dnom d (is=1e-15)
+.ENDS
+*
+* ======================================================================== 
+* THAT 2180B VCA SPICE Macromodel, Beta Version 1.B3 12/30/97*
+* Copyright 1997 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* Pin 4 is not used on the 2180-series VCAs.
+*                 Iin          
+*                  |  Ec+ 
+*                  |   |   Ec-
+*                  |   |   |  Vee 
+*                  |   |   |   |  GND
+*                  |   |   |   |   |  Vcc 
+*                  |   |   |   |   |   |  Iout
+*                  |   |   |   |   |   |   |
+.SUBCKT 2180B_THAT 1   2   3   5   6   7   8 
+*
+*
+*
+R1         10 13  2.5k  
+R2         10 14  2.5k  
+I1         10 29 DC 50uA  
+R3         11 7  8k  
+R4         12 7  8k  
+G1         7 15 11 12 1.25e-4
+R5         0 15  10MEG  
+R6         0 16  10k  
+C1         16 15  10p  
+R7         19 7  2k  
+G2         19 20 15 0 5e-4
+C2         19 7  8p  
+E1         20 28 30 0 2
+R8         5 29  1.7k  
+V1         0 29 DC 2.1V  
+I2         0 30 DC 20uA  
+R9         4 2 27  
+C3         20 0 12p  
+I3         20 28 DC 220uA  
+V2         18 0 DC .7V  
+V3         17 15 DC 1.4V  
+Q1         11 1 13 QNHIB 
+Q2         12 9 14 QNHIB 
+Q3         20 21 23 QNPNNOM 
+Q4         20 22 24 QNPNNOM 
+Q5         8 4 27 QNPNNOM 
+Q6         1 25 26 QNPNNOM 
+Q7         1 2 23 QPNPNOM 
+Q8         8 3 24 QPNPNOM 
+Q9         28 28 27 QPNPNOM 
+Q10        28 28 26 QPNPNOM 
+Q11        28 29 5 QNPNNOM 
+Q12        30 30 31 QNPNNOM 
+Q13        0 0 31 QPNPNOM 
+D1         18 15 DNOM 
+D2         17 7 DNOM 
+R10        3 25  20 
+R11        22 20 20
+R12        21 20 27 
+Vos        9 6 DC 3mV  
+Isym       0 4 DC -850nA 
+*    Isym = -850nA for typical THD.  Set to -2.15uA for worst case THD.
+.model qnpnnom npn (is=1e-15 bf=150, vaf=110,cjc=3pF)
+.model qpnpnom pnp (is=1e-15 bf=100, vaf=85, cjc=5pf)
+.model qnhib npn (bf=14000)
+.model dnom d (is=1e-15)
+.ENDS
+*
+* ======================================================================== 
+* THAT 2180C VCA SPICE Macromodel, Beta Version 1.B3 12/30/97*
+* Copyright 1997 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* Pin 4 is not used on the 2180-series VCAs.
+*
+*                 Iin          
+*                  |  Ec+ 
+*                  |   |   Ec-
+*                  |   |   |  Vee 
+*                  |   |   |   |  GND
+*                  |   |   |   |   |  Vcc 
+*                  |   |   |   |   |   |  Iout
+*                  |   |   |   |   |   |   |
+.SUBCKT 2180C_THAT 1   2   3   5   6   7   8 
+*
+*
+*
+R1         10 13  2.5k  
+R2         10 14  2.5k  
+I1         10 29 DC 50uA  
+R3         11 7  8k  
+R4         12 7  8k  
+G1         7 15 11 12 1.25e-4
+R5         0 15  10MEG  
+R6         0 16  10k  
+C1         16 15  10p  
+R7         19 7  2k  
+G2         19 20 15 0 5e-4
+C2         19 7  8p  
+E1         20 28 30 0 2
+R8         5 29  1.7k  
+V1         0 29 DC 2.1V  
+I2         0 30 DC 20uA  
+R9         4 2  27  
+C3         20 0  12p  
+I3         20 28 DC 220uA  
+V2         18 0 DC .7V  
+V3         17 15 DC 1.4V  
+Q1         11 1 13 QNHIB 
+Q2         12 9 14 QNHIB 
+Q3         20 21 23 QNPNNOM 
+Q4         20 22 24 QNPNNOM 
+Q5         8 4 27 QNPNNOM 
+Q6         1 25 26 QNPNNOM 
+Q7         1 2 23 QPNPNOM 
+Q8         8 3 24 QPNPNOM 
+Q9         28 28 27 QPNPNOM 
+Q10        28 28 26 QPNPNOM 
+Q11        28 29 5 QNPNNOM 
+Q12        30 30 31 QNPNNOM 
+Q13        0 0 31 QPNPNOM 
+D1         18 15 DNOM 
+D2         17 7 DNOM 
+R10        3 25  20  
+R11        22 20 20  
+R12        21 20 27  
+Vos        9 6 DC 3mV  
+Isym       0 4 DC -3.3uA  
+*    Isym = -3.3uA for typical THD.  Set to -5.9uA for worst case THD.
+.model qnpnnom npn (is=1e-15 bf=110, vaf=110, cjc=3pF)
+.model qpnpnom pnp (is=1e-15 bf=100, vaf=85, cjc=5pf)
+.model qnhib npn (bf=12000)
+.model dnom d (is=1e-15)
+.ENDS
+*
+* ======================================================================== 
+* THAT 2181A VCA SPICE Macromodel, Beta Version 1.B3 12/30/97*
+* Copyright 1997 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* 
+*
+*                 Iin          
+*                  |  Ec+ 
+*                  |   |   Ec-
+*                  |   |   |  Sym
+*                  |   |   |   |  Vee
+*                  |   |   |   |   |  GND
+*                  |   |   |   |   |   |  Vcc
+*                  |   |   |   |   |   |   |  Iout
+*                  |   |   |   |   |   |   |   |
+.SUBCKT 2181A_THAT 1   2   3   4   5   6   7   8 
+*
+*
+*
+R1         10 13  2.5k  
+R2         10 14  2.5k  
+I1         10 29 DC 50uA  
+R3         11 7  8k  
+R4         12 7  8k  
+G1         7 15 11 12 1.25e-4
+R5         0 15  10MEG  
+R6         0 16  10k  
+C1         16 15  10p  
+R7         19 7  2k  
+G2         19 20 15 0 5e-4
+C2         19 7  8p  
+E1         20 28 30 0 2
+R8         5 29  1.7k  
+V1         0 29 DC 2.1V  
+I2         0 30 DC 20uA  
+R9         4 2  27  
+C3         20 0  12p  
+I3         20 28 DC 220uA  
+V2         18 0 DC .7V  
+V3         17 15 DC 1.4V  
+Q1         11 1 13 QNHIB 
+Q2         12 9 14 QNHIB 
+Q3         20 21 23 QNPNNOM 
+Q4         20 22 24 QNPNNOM 
+Q5         8 4 27 QNPNNOM 
+Q6         1 25 26 QNPNNOM 
+Q7         1 2 23 QPNPNOM 
+Q8         8 3 24 QPNPNOM 
+Q9         28 28 27 QPNPNOM 
+Q10        28 28 26 QPNPNOM 
+Q11        28 29 5 QNPNNOM 
+Q12        30 30 31 QNPNNOM 
+Q13        0 0 31 QPNPNOM 
+D1         18 15 DNOM 
+D2         17 7 DNOM 
+R10        3 25  22  
+R11        22 20 22  
+R12        21 20 27  
+Vos        9 6 DC 3mV  
+.model qnpnnom npn (is=1e-15 bf=200, vaf=110, cjc=3pF)
+.model qpnpnom pnp (is=1e-15 bf=100, vaf=85, cjc=5pf)
+.model qnhib npn (bf=16000)
+.model dnom d (is=1e-15)
+.ENDS   
+*
+* ======================================================================== 
+* THAT 2181B VCA SPICE Macromodel, Beta Version 1.B3 12/30/97*
+* Copyright 1997 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* 
+*
+*                 Iin          
+*                  |  Ec+ 
+*                  |   |   Ec-
+*                  |   |   |  Sym
+*                  |   |   |   |  Vee
+*                  |   |   |   |   |  GND
+*                  |   |   |   |   |   |  Vcc
+*                  |   |   |   |   |   |   |  Iout
+*                  |   |   |   |   |   |   |   |
+.SUBCKT 2181B_THAT 1   2   3   4   5   6   7   8 
+*
+*
+*
+R1         10 13  2.5k  
+R2         10 14  2.5k  
+I1         10 29 DC 50uA  
+R3         11 7  8k  
+R4         12 7  8k  
+G1         7 15 11 12 1.25e-4
+R5         0 15  10MEG  
+R6         0 16  10k  
+C1         16 15  10p  
+R7         19 7  2k  
+G2         19 20 15 0 5e-4
+C2         19 7  8p  
+E1         20 28 30 0 2
+R8         5 29  1.7k  
+V1         0 29 DC 2.1V  
+I2         0 30 DC 20uA  
+R9         4 2  27  
+C3         20 0  12p  
+I3         20 28 DC 220uA  
+V2         18 0 DC .7V  
+V3         17 15 DC 1.4V  
+Q1         11 1 13 QNHIB 
+Q2         12 9 14 QNHIB 
+Q3         20 21 23 QNPNNOM 
+Q4         20 22 24 QNPNNOM 
+Q5         8 4 27 QNPNNOM 
+Q6         1 25 26 QNPNNOM 
+Q7         1 2 23 QPNPNOM 
+Q8         8 3 24 QPNPNOM 
+Q9         28 28 27 QPNPNOM 
+Q10        28 28 26 QPNPNOM 
+Q11        28 29 5 QNPNNOM 
+Q12        30 30 31 QNPNNOM 
+Q13        0 0 31 QPNPNOM 
+D1         18 15 DNOM 
+D2         17 7 DNOM 
+R10        3 25  20  
+R11        22 20 20  
+R12        21 20 27  
+Vos        9 6 DC 3mV  
+.model qnpnnom npn (is=1e-15 bf=150, vaf=110, cjc=3pF)
+.model qpnpnom pnp (is=1e-15 bf=100, vaf=85, cjc=5pf)
+.model qnhib npn (bf=14000)
+.model dnom d (is=1e-15)
+.ENDS   
+*
+* ======================================================================== 
+* THAT 2181C VCA SPICE Macromodel, Beta Version 1.B3 12/30/97*
+* Copyright 1997 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* 
+*
+*                 Iin          
+*                  |  Ec+ 
+*                  |   |   Ec-
+*                  |   |   |  Sym
+*                  |   |   |   |  Vee
+*                  |   |   |   |   |  GND
+*                  |   |   |   |   |   |  Vcc
+*                  |   |   |   |   |   |   |  Iout
+*                  |   |   |   |   |   |   |   |
+.SUBCKT 2181C_THAT 1   2   3   4   5   6   7   8 
+*
+*
+*
+R1         10 13  2.5k  
+R2         10 14  2.5k  
+I1         10 29 DC 50uA  
+R3         11 7  8k  
+R4         12 7  8k  
+G1         7 15 11 12 1.25e-4
+R5         0 15  10MEG  
+R6         0 16  10k  
+C1         16 15  10p  
+R7         19 7  2k  
+G2         19 20 15 0 5e-4
+C2         19 7  8p  
+E1         20 28 30 0 2
+R8         5 29  1.7k  
+V1         0 29 DC 2.1V  
+I2         0 30 DC 20uA  
+R9         4 2  27  
+C3         20 0  12p  
+I3         20 28 DC 220uA  
+V2         18 0 DC .7V  
+V3         17 15 DC 1.4V  
+Q1         11 1 13 QNHIB 
+Q2         12 9 14 QNHIB 
+Q3         20 21 23 QNPNNOM 
+Q4         20 22 24 QNPNNOM 
+Q5         8 4 27 QNPNNOM 
+Q6         1 25 26 QNPNNOM 
+Q7         1 2 23 QPNPNOM 
+Q8         8 3 24 QPNPNOM 
+Q9         28 28 27 QPNPNOM 
+Q10        28 28 26 QPNPNOM 
+Q11        28 29 5 QNPNNOM 
+Q12        30 30 31 QNPNNOM 
+Q13        0 0 31 QPNPNOM 
+D1         18 15 DNOM 
+D2         17 7 DNOM 
+R10        3 25  20  
+R11        22 20 20  
+R12        21 20 27  
+Vos        9 6 DC 3mV  
+.model qnpnnom npn (is=1e-15 bf=110, vaf=110, cjc=3pF)
+.model qpnpnom pnp (is=1e-15 bf=100, vaf=85, cjc=5pf)
+.model qnhib npn (bf=12000)
+.model dnom d (is=1e-15)
+.ENDS   
+*
+*
+* ======================================================================== 
+* THAT 2252V02 RMS SPICE Macromodel, Beta Version 1.B3 3/5/98*
+* Copyright 1998 THAT Corporation, all rights reserved.
+*
+* Note: Macromodel net numbers correspond to the IC package numbers.
+* 
+*                   In          
+*                    |  Sym 
+*                    |   |   GND
+*                    |   |    |  Vee
+*                    |   |    |   |  Ibias
+*                    |   |    |   |   |  Out
+*                    |   |    |   |   |   |  Cap
+*                    |   |    |   |   |   |   |  Vcc
+*                    |   |    |   |   |   |   |   |
+.SUBCKT 2252RMS_THAT IN SYM GND Vee IBIAS OUT CAP Vcc
+*
+E_E3         2 3 1 0 1
+R_Rn2         1 0  1  
+C_Cn2         1 0  1p  
+R_Rp2         0 4  1  
+E_E4         5 0 4 0 1
+R_Rp3         0 6  1  
+C_Cp3         0 6  53.08n  
+G_G2         0 4 2 7 100000
+E_E5         8 0 6 0 1
+C_Cp2         0 4  90.5n  
+G_G3         0 6 CAP 9 100000
+R_Rd         CAP 10  0.000001  
+F_F1         Vcc 9 VF_F1 0.119
+VF_F1        11 12 0V
+I_I3         Vcc 9 DC 0.0001uA  
+I_I1         Vcc 0 DC 1mA  
+F_F2         Vcc 3 VF_F2 0.119
+VF_F2        12 13 0V
+I_I11         0 14 DC 10pA  
+E_E6         15 16 14 0 1
+F_F4         17 Vee VF_F4 0.33
+VF_F4        13 Vee 0V
+I_I2         0 Vee DC 1mA  
+V_Voff         18 0 0mV
+E_E1         15 0 19 20 1
+R_Rp1         20 19  5Meg  
+C_Cp1         20 19  5pF  
+F_F5         Vcc 20 VF_F5 1
+VF_F5        Vcc 19 0V
+R_Rb         IN 21  20  
+V_V8         OUT 8 4mV
+Q_Q39         19 IN 17 n2252hib 1
+Q_Q40         20 18 17 n2252hib 1
+Q_Q41         22 22 23 n2252lob 1
+Q_Q42         23 23 11 n2252lob 1
+Q_Q43         5 5 24 n2252lob 1
+Q_Q44         9 9 25 n2252lob 1
+Q_Q45         25 25 8 n2252lob 1
+Q_Q46         3 3 0 n2252lob 1
+Q_Q47         14 14 26 n2252lob 1
+Q_Q48         26 26 0 n2252lob 1
+Q_Q49         5 5 10 n2252lob 1
+Q_Q50         IBIAS IBIAS 22 n2252lob 1
+Q_Q51         7 SYM 16 n2252lob 1
+Q_Q52         7 15 IN n2252lob 1
+Q_Q53         24 24 7 n2252lob 1
+Q_Q54         IN 21 16 n2252lob 1
+.ENDS    
+*
+*$
+.model n2252hib	NPN(is=1e-15 bf=1600, vaf=110, cjc=3pF)
+*$
+*$
+.model n2252lob	NPN(is=1e-15 bf=100, vaf=110, cjc=3pF)
+*
+*$
+* ======================================================================== 
+* THAT 124x series P,S packages
+* REV 00 - created on 09/17/2004, by FF
+*
+*
+* DEVICE=THAT1240 P,S 0dB gain Line receiver
+* THAT1240 "macromodel" created on 09/17/2004, by FF
+*
+* connections:    non-inverting input
+*                 |   inverting input
+*                 |   |   positive power supply
+*                 |   |   |   negative power supply
+*                 |   |   |   |   output
+*                 |   |   |   |   |   ref voltage or GND
+*                 |   |   |   |   |   |   sense
+*                 |   |   |   |   |   |   |
+.subckt 1240_THAT IN+ IN- VCC VEE OUT REF SENSE
+*
+R_R1         IN+ 40  9000  
+R_R3         IN- 50  9000  
+R_R4         50 SENSE  9000.5692  
+R_R2         40 REF  9000  
+D_D13         SENSE VCC DPROT 
+D_D11         OUT VCC DPROT 
+D_D9         REF VCC DPROT 
+D_D2         10 IN+ DPROT 
+D_D1         10 VCC DPROT 
+D_D4         11 IN- DPROT 
+D_D3         11 VCC DPROT 
+D_D7         13 IN- DPROT 
+D_D5         12 IN+ DPROT 
+D_D8         13 VEE DPROT 
+D_D6         12 VEE DPROT 
+D_D10         VEE REF DPROT 
+D_D12         VEE OUT DPROT 
+D_D14         VEE SENSE DPROT 
+X_U1         40 50 VCC VEE OUT OA_33X36706
+.ends
+*$
+* ========================================================================
+* DEVICE=THAT1243 P,S -3dB gain Line receiver
+* THAT1243 "macromodel" created on 09/17/2004, by FF
+*
+* connections:    non-inverting input
+*                 |   inverting input
+*                 |   |   positive power supply
+*                 |   |   |   negative power supply
+*                 |   |   |   |   output
+*                 |   |   |   |   |   ref voltage or GND
+*                 |   |   |   |   |   |   sense
+*                 |   |   |   |   |   |   |
+.subckt 1243_THAT IN+ IN- VCC VEE OUT REF SENSE
+*
+R_R1         IN+ 40  10500  
+R_R3         IN- 50  10500  
+R_R4         50 SENSE  7500.405  
+R_R2         40 REF  7500  
+D_D13         SENSE VCC DPROT 
+D_D11         OUT VCC DPROT 
+D_D9         REF VCC DPROT 
+D_D2         10 IN+ DPROT 
+D_D1         10 VCC DPROT 
+D_D4         11 IN- DPROT 
+D_D3         11 VCC DPROT 
+D_D7         13 IN- DPROT 
+D_D5         12 IN+ DPROT 
+D_D8         13 VEE DPROT 
+D_D6         12 VEE DPROT 
+D_D10         VEE REF DPROT 
+D_D12         VEE OUT DPROT 
+D_D14         VEE SENSE DPROT 
+X_U1         40 50 VCC VEE OUT OA_33X36706
+.ends
+*$
+* ========================================================================
+* DEVICE=THAT1246 P,S -6dB gain Line receiver
+* THAT1246 "macromodel" created on 09/17/2004, by FF
+*
+* connections:    non-inverting input
+*                 |   inverting input
+*                 |   |   positive power supply
+*                 |   |   |   negative power supply
+*                 |   |   |   |   output
+*                 |   |   |   |   |   ref voltage or GND
+*                 |   |   |   |   |   |   sense
+*                 |   |   |   |   |   |   |
+.subckt 1246_THAT IN+ IN- VCC VEE OUT REF SENSE
+*
+R_R1         IN+ 40  12k  
+R_R3         IN- 50  12k  
+R_R4         50 SENSE  6000.285  
+R_R2         40 REF  6k  
+D_D13         SENSE VCC DPROT 
+D_D11         OUT VCC DPROT 
+D_D9         REF VCC DPROT 
+D_D2         10 IN+ DPROT 
+D_D1         10 VCC DPROT 
+D_D4         11 IN- DPROT 
+D_D3         11 VCC DPROT 
+D_D7         13 IN- DPROT 
+D_D5         12 IN+ DPROT 
+D_D8         13 VEE DPROT 
+D_D6         12 VEE DPROT 
+D_D10         VEE REF DPROT 
+D_D12         VEE OUT DPROT 
+D_D14         VEE SENSE DPROT 
+X_U1         40 50 VCC VEE OUT OA_33X36706
+.ends
+*$
+* ========================================================================
+* DEVICE=OA_33X36706,OPAMP,PNP,INT
+* OA_33X36706 operational amplifier "macromodel" subcircuit for THAT124x series
+* created using Parts release 8.0 on 09/16/2004 by FF
+* Parts is a MicroSim product.
+*
+* connections:      non-inverting input
+*                   | inverting input
+*                   | | positive power supply
+*                   | | | negative power supply
+*                   | | | | output
+*                   | | | | |
+.subckt OA_33X36706 1 2 3 4 5
+*
+   c1   11 12 285.31E-15
+  c2    6  7 12.100E-12
+  dc    5 53 dy
+  de   54  5 dy
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 504.64E3 -1E3 1E3 500E3 -500E3
+  ga    6  0 11 12 1.1632E-3
+  gcm   0  6 10 99 1.1632E-9
+  iee   3 10 dc 147.60E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx1
+  q2   12  1 14 qx2
+  r2    6  9 100.00E3
+  rc1   4 11 859.69
+  rc2   4 12 859.69
+  re1  13 10 495.25
+  re2  14 10 495.25
+  ree  10 99 1.3550E6
+  ro1   8  5 27
+  ro2   7 99 27
+  rp    3  4 16.185E3
+  vb    9  0 dc 0
+  vc    3 53 dc 2.8037
+  ve   54  4 dc 2.8037
+  vlim  7  8 dc 0
+  vlp  91  0 dc 25
+  vln   0 92 dc 25
+.model dx D(Is=800.00E-18)
+.model dy D(Is=800.00E-18 Rs=1m Cjo=10p)
+.model qx1 PNP(Is=800.00E-18 Bf=60.500)
+.model qx2 PNP(Is=800.0000E-18 Bf=60.500)
+.ends
+*$
+* THAT124x models end here
+*$
+* ========================================================================
+* THAT 120x series P,S packages
+* REV 00 - created on 09/24/2004, by FF
+*
+*
+* DEVICE=THAT1200 P,S 0dB gain Line receiver
+* THAT1200 "macromodel" created on 09/24/2004, by FF
+*
+* connections:    non-inverting input
+*                 |   inverting input
+*                 |   |   positive power supply
+*                 |   |   |   negative power supply
+*                 |   |   |   |   output
+*                 |   |   |   |   |   ref voltage or GND
+*                 |   |   |   |   |   |   CM input
+*                 |   |   |   |   |   |   |    CM output
+*                 |   |   |   |   |   |   |    |
+.subckt 1200_THAT IN+ IN- VCC VEE OUT REF CMIN CMOUT
+*
+R_R4         2 CMIN  24k  
+R_R7         5 4  24k  
+R_R6         3 5  24k  
+X_U1         1 3 Vcc Vee 3 OA1456_01
+X_U2         2 4 Vcc Vee 4 OA1456_01
+R_R5         REF CMIN  24k  
+R_R10         6 REF  6000  
+R_R8         3 6  6000  
+R_R9         4 7  6000.47
+X_U4         6 7 Vcc Vee OUT OA3456_01
+X_U3         5 CMOUT Vcc Vee CMOUT OA4456_01
+R_R11         7 OUT  6000  
+R_R3         CMIN 1  24k  
+R_R2         IN- 2  0.00001  
+R_R1         IN+ 1  0.00001  
+D_D10         Vee CMIN DPROT 
+D_D7         11 IN+ DPROT 
+D_D8         11 Vee DPROT 
+D_D6         10 Vee DPROT 
+D_D5         10 IN+ DPROT 
+D_D9         CMIN Vcc DPROT 
+D_D2         8 IN+ DPROT 
+D_D1         8 Vcc DPROT 
+D_D4         9 Vcc DPROT 
+D_D3         9 IN+ DPROT 
+D_D15         REF Vcc DPROT 
+D_D14         Vee OUT DPROT 
+D_D13         OUT Vcc DPROT 
+D_D16         Vee REF DPROT 
+D_D11         CMOUT Vcc DPROT 
+D_D12         Vee CMOUT DPROT 
+.ends
+*$
+* ==========================================================================
+*
+* DEVICE=THAT1203 P,S -3dB gain Line receiver
+* THAT1206 "macromodel" created on 09/24/2004, by FF
+*
+* connections:    non-inverting input
+*                 |   inverting input
+*                 |   |   positive power supply
+*                 |   |   |   negative power supply
+*                 |   |   |   |   output
+*                 |   |   |   |   |   ref voltage or GND
+*                 |   |   |   |   |   |   CM input
+*                 |   |   |   |   |   |   |    CM output
+*                 |   |   |   |   |   |   |    |
+.subckt 1203_THAT IN+ IN- VCC VEE OUT REF CMIN CMOUT
+*
+R_R4         2 CMIN  17k  
+R_R7         5 4  24k  
+R_R6         3 5  24k  
+X_U1         1 3 Vcc Vee 3 OA1456_01
+X_U2         2 4 Vcc Vee 4 OA1456_01
+R_R5         REF CMIN  24k  
+R_R10         6 REF  6000  
+R_R8         3 6  6000  
+R_R9         4 7  6000.37  
+X_U4         6 7 Vcc Vee OUT OA3456_01
+X_U3         5 CMOUT Vcc Vee CMOUT OA4456_01
+R_R11         7 OUT  6000  
+R_R3         CMIN 1  17k  
+R_R2         IN- 2  7k  
+R_R1         IN+ 1  7k  
+D_D10         Vee CMIN DPROT 
+D_D7         11 IN+ DPROT 
+D_D8         11 Vee DPROT 
+D_D6         10 Vee DPROT 
+D_D5         10 IN+ DPROT 
+D_D9         CMIN Vcc DPROT 
+D_D2         8 IN+ DPROT 
+D_D1         8 Vcc DPROT 
+D_D4         9 Vcc DPROT 
+D_D3         9 IN+ DPROT 
+D_D15         REF Vcc DPROT 
+D_D14         Vee OUT DPROT 
+D_D13         OUT Vcc DPROT 
+D_D16         Vee REF DPROT 
+D_D11         CMOUT Vcc DPROT 
+D_D12         Vee CMOUT DPROT 
+.ends
+*$
+* ==========================================================================
+* DEVICE=THAT1206 P,S -6dB gain Line receiver
+* THAT1206 "macromodel" created on 09/24/2004, by FF
+*
+* connections:    non-inverting input
+*                 |   inverting input
+*                 |   |   positive power supply
+*                 |   |   |   negative power supply
+*                 |   |   |   |   output
+*                 |   |   |   |   |   ref voltage or GND
+*                 |   |   |   |   |   |   CM input
+*                 |   |   |   |   |   |   |    CM output
+*                 |   |   |   |   |   |   |    |
+.subckt 1206_THAT IN+ IN- VCC VEE OUT REF CMIN CMOUT
+*
+R_R4         2 CMIN  17k  
+R_R7         5 4  24k  
+R_R6         3 5  24k  
+X_U1         1 3 Vcc Vee 3 OA1456_01
+X_U2         2 4 Vcc Vee 4 OA1456_01
+R_R5         REF CMIN  24k  
+R_R10         6 REF  5k  
+R_R8         3 6  7066  
+R_R9         4 7  7066  
+X_U4         6 7 Vcc Vee OUT OA3456_01
+X_U3         5 CMOUT Vcc Vee CMOUT OA4456_01
+R_R11         7 OUT  5000.1  
+R_R3         CMIN 1  17k  
+R_R2         IN- 2  7k  
+R_R1         IN+ 1  7k  
+D_D10         Vee CMIN DPROT 
+D_D7         11 IN+ DPROT 
+D_D8         11 Vee DPROT 
+D_D6         10 Vee DPROT 
+D_D5         10 IN+ DPROT 
+D_D9         CMIN Vcc DPROT 
+D_D2         8 IN+ DPROT 
+D_D1         8 Vcc DPROT 
+D_D4         9 Vcc DPROT 
+D_D3         9 IN+ DPROT 
+D_D15         REF Vcc DPROT 
+D_D14         Vee OUT DPROT 
+D_D13         OUT Vcc DPROT 
+D_D16         Vee REF DPROT 
+D_D11         CMOUT Vcc DPROT 
+D_D12         Vee CMOUT DPROT 
+.ends
+*$
+* ==========================================================================
+* OA1456_01 operational amplifier "macromodel" subcircuit for THAT120x series
+* created using Parts release 8.0 on 09/21/104 at 14:01
+* Parts is a MicroSim product.
+*
+* connections:   non-inverting input
+*                | inverting input
+*                | | positive power supply
+*                | | | negative power supply
+*                | | | | output
+*                | | | | |
+.subckt OA1456_01 1 2 3 4 5
+*
+  c1   11 12 866.03E-15
+  c2    6  7 3.0000E-12
+  cee  10 99 352.17E-15
+  dc    5 53 dy
+  de   54  5 dy
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 405.86E3 -1E3 1E3 410E3 -410E3
+  ga    6  0 11 12 439.19E-6
+  gcm   0  6 10 99 4.3919E-9
+  iee   3 10 dc 78.480E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx1
+  q2   12  1 14 qx2
+  r2    6  9 100.00E3
+  rc1   4 11 2.2769E3
+  rc2   4 12 2.2769E3
+  re1  13 10 1.5777E3
+  re2  14 10 1.5777E3
+  ree  10 99 2.5484E6
+  ro1   8  5 50
+  ro2   7 99 50
+  rp    3  4 32.531E3
+  vb    9  0 dc 0
+  vc    3 53 dc 1.9847
+  ve   54  4 dc 2.3847
+  vlim  7  8 dc 0
+  vlp  91  0 dc 12
+  vln   0 92 dc 12
+.model dx D(Is=800.00E-18)
+.model dy D(Is=800.00E-18 Rs=1m Cjo=10p)
+.model qx1 PNP(Is=800.00E-18 Bf=55.870)
+.model qx2 PNP(Is=800.0000E-18 Bf=55.870)
+.ends
+*$
+* ==========================================================================
+* OA3456_01 operational amplifier "macromodel" subcircuit for THAT120x series
+* created using Parts release 8.0 on 09/21/104 at 14:16
+* Parts is a MicroSim product.
+*
+* connections:   non-inverting input
+*                | inverting input
+*                | | positive power supply
+*                | | | negative power supply
+*                | | | | output
+*                | | | | |
+.subckt OA3456_01 1 2 3 4 5
+*
+  c1   11 12 3.4352E-12
+  c2    6  7 11.900E-12
+  dc    5 53 dy
+  de   54  5 dy
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 90.553E3 -1E3 1E3 91E3 -91E3
+  ga    6  0 11 12 2.7216E-3
+  gcm   0  6 10 99 27.216E-9
+  iee   3 10 dc 154.70E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx1
+  q2   12  1 14 qx2
+  r2    6  9 100.00E3
+  rc1   4 11 367.43
+  rc2   4 12 367.43
+  re1  13 10 33.049
+  re2  14 10 33.049
+  ree  10 99 1.2928E6
+  ro1   8  5 42
+  ro2   7 99 42
+  rp    3  4 13.481E3
+  vb    9  0 dc 0
+  vc    3 53 dc 3.0057
+  ve   54  4 dc 2.0057
+  vlim  7  8 dc 0
+  vlp  91  0 dc 27
+  vln   0 92 dc 27
+.model dx D(Is=800.00E-18)
+.model dy D(Is=800.00E-18 Rs=1m Cjo=10p)
+.model qx1 PNP(Is=800.00E-18 Bf=69.685E3)
+.model qx2 PNP(Is=800.0000E-18 Bf=69.685E3)
+.ends
+*$
+* ==========================================================================
+* OA4456_01 operational amplifier "macromodel" subcircuit for THAT120x series
+* created using Parts release 8.0 on 09/21/104 at 17:53
+* Parts is a MicroSim product.
+*
+* connections:   non-inverting input
+*                | inverting input
+*                | | positive power supply
+*                | | | negative power supply
+*                | | | | output
+*                | | | | |
+.subckt OA4456_01 1 2 3 4 5
+*
+  c1   11 12 498.66E-15
+  c2    6  7 4.0000E-12
+  cee  10 99 1.0980E-12
+  dc    5 53 dy
+  de   54  5 dy
+  dlp  90 91 dx
+  dln  92 90 dx
+  dp    4  3 dx
+  egnd 99  0 poly(2) (3,0) (4,0) 0 .5 .5
+  fb    7 99 poly(5) vb vc ve vlp vln 0 20.789E3 -1E3 1E3 21E3 -21E3
+  ga    6  0 11 12 588.11E-6
+  gcm   0  6 10 99 5.8811E-9
+  iee   3 10 dc 105.40E-6
+  hlim 90  0 vlim 1K
+  q1   11  2 13 qx1
+  q2   12  1 14 qx2
+  r2    6  9 100.00E3
+  rc1   4 11 1.7004E3
+  rc2   4 12 1.7004E3
+  re1  13 10 1.1870E3
+  re2  14 10 1.1870E3
+  ree  10 99 1.8975E6
+  ro1   8  5 167
+  ro2   7 99 167
+  rp    3  4 95.147E3
+  vb    9  0 dc 0
+  vc    3 53 dc 1.7773
+  ve   54  4 dc 2.3773
+  vlim  7  8 dc 0
+  vlp  91  0 dc 9
+  vln   0 92 dc 9
+.model dx D(Is=800.00E-18)
+.model dy D(Is=800.00E-18 Rs=1m Cjo=10p)
+.model qx1 PNP(Is=800.00E-18 Bf=74.286)
+.model qx2 PNP(Is=800.0000E-18 Bf=74.286)
+.ends
+*$
+* THAT120x models end here
+*$
+* ========================================================================
+* Protection diode model for THAT124x and THAT120x series
+*
+.MODEL DPROT D (IS=864.10E-18 RS=100 CJO=194.00E-15 M=.42945 BV=60 IBV=1E-10)
+*$
+*
+* ======================================================================== 
+*THAT 300-Series Noise Performance Optimized Models
+.MODEL QPNP_THAT_NS PNP (
++ IS     = 2.330327E-15    BF     = 80
++ NF     = 0.998           BR     = 54.6051301
++ NR     = 1               ISE    = 6.471784E-14    NE     = 1.5256667
++ ISC    = 9.821992E-14    NC     = 1.4090231       VAF    = 50
++ VAR    = 8.5915034       IKF    = 0.1605012       IKR    = 2.997951E-3
++ RB     = 25              RBM    = 1.604356        IRB    = 1.3734E-4
++ RE     = 0.2             RC     = 17.9803001      CJE    = 5.921046E-12
++ VJE    = 0.7302802       MJE    = 0.49864         FC     = 0.9317095
++ CJC    = 3.374991E-12    VJC    = 0.6162124       MJC    = 0.497456
++ TF     = 2.416792E-10    XTF    = 5.9184348       ITF    = 0.0726275
++ VTF    = 1.2378779       QCO     = 1E-12          RCO    = 1
++ VO     = 1               GAMMA   = 1E-13          XTB    = 1.2
++ PTF	   = 20)
+*                                                                   
+.MODEL QNPN_THAT_NS NPN (
++ IS     = 5.005475E-15    BF     = 150
++ NF     = 1               BR     = 119.4532856 
++ NR     = 1               ISE    = 3.002016E-16    NE     = 1.3340565
++ ISC    = 3.173175E-14    NC     = 1.6525          VAF    = 60
++ VAR    = 10.8094728      IKF    = 0.2850543       IKR    = 0.0103675
++ RB      = 30             RBM     = 2.94235        IRB    = 1.750788E-4
++ RE     = 0.2             RC     = 12.4561714      CJE    = 5.086292E-12
++ VJE    = 0.7241957       MJE    = 0.49456         FC     = 0.97
++ CJC    = 2.190824E-12    VJC    = 0.5595858       MJC    = 0.498675
++ TF     = 7.063932E-11    XTF    = 17.846692       ITF    = 0.0862198
++ VTF    = 1.7447209       QCO     = 1E-12          RCO    = 1
++ VO      = 1              GAMMA   = 1E-13          XTB    = 1.1
++ PTF	   = 20)
+*                                                                                 
+* THAT 300-Series Transistor Models - High Frequency Performance Optimized
+.MODEL QPNP_THAT_HF PNP (
++ IS     = 2.330327E-15    BF     = 80
++ NF     = 0.998           BR     = 54.6051301
++ NR     = 1               ISE    = 6.471784E-14    NE     = 1.5256667
++ ISC    = 9.821992E-14    NC     = 1.4090231       VAF    = 50
++ VAR    = 8.5915034       IKF    = 0.1605012       IKR    = 2.997951E-3
++ RB     = 103.345         RBM    = 2.20352         IRB    = 1.3734E-4
++ RE     = 0.2             RC     = 17.9803001      CJE    = 5.921046E-12
++ VJE    = 0.7302802       MJE    = 0.49864         FC     = 0.9317095
++ CJC    = 3.374991E-12    VJC    = 0.6162124       MJC    = 0.497456
++ TF     = 2.416792E-10    XTF    = 5.9184348       ITF    = 0.0726275
++ VTF    = 1.2378779       QCO     = 1E-12          RCO    = 1
++ VO     = 1               GAMMA   = 1E-13          XTB    = 1.2
++ PTF	   = 20)
+*                                                                   
+.MODEL QNPN_THAT_HF NPN (
++ IS     = 5.005475E-15    BF     = 150
++ NF     = 1               BR     = 119.4532856 
++ NR     = 1               ISE    = 3.002016E-16    NE     = 1.3340565
++ ISC    = 3.173175E-14    NC     = 1.6525          VAF    = 60
++ VAR    = 10.8094728      IKF    = 0.2850543       IKR    = 0.0103675
++ RB     = 117.3192        RBM    = 2.035           IRB    = 1.750788E-4
++ RE     = 0.2             RC     = 12.4561714      CJE    = 5.086292E-12
++ VJE    = 0.7241957       MJE    = 0.49456         FC     = 0.97
++ CJC    = 2.190824E-12    VJC    = 0.5595858       MJC    = 0.498675
++ TF     = 7.063932E-11    XTF    = 17.846692       ITF    = 0.0862198
++ VTF    = 1.7447209       QCO     = 1E-12          RCO    = 1
++ VO      = 1              GAMMA   = 1E-13          XTB    = 1.1
++ PTF	   = 20)
+*
+*$
+
+
+

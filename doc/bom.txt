@@ -1,0 +1,19 @@
+
+== AVR ==
+
+->Resistor R2R Network, 8 Bit
+Bourns 4816P-R2R-503LF
+http://de.mouser.com/ProductDetail/Bourns/4816P-R2R-503LF/?qs=sGAEpiMZZMvrmc6UYKmaNU9EMxd2hjdcBP9l1IKNuvE%3d
+
+== MIDI ==
+
+-> Hex Inverting Schmitt Trigger
+http://de.mouser.com/ProductDetail/NXP-Semiconductors/74HC14D653/?qs=sGAEpiMZZMvKM5ialpXrmr8sHE43%252b6cX
+
+-> Optocoupler
+http://de.mouser.com/ProductDetail/Vishay-Semiconductors/6N138-X009/?qs=sGAEpiMZZMtd3yBnp8bAgKKtcCuBN9mpb%2fPZXgLmbbA%3d
+
+== SUPPLY ==
+
+-> 5V SMPS, pincompatible with 7805
+http://de.mouser.com/ProductDetail/RECOM-Power/R-78E50-05/?qs=sGAEpiMZZMtwaiKVUtQsNdyQYa4auFR1JPviMI71Coc%3d
